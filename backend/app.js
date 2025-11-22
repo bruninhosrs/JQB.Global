@@ -6,9 +6,11 @@ const routes = require("./routes/router")
 
 app.use(cors());
 app.use(express.json());
+app.use(routes);
 
-conn();
+
 // Inicia o servidor!
 app.listen(3000, function () {
   console.log(`Servidor Online!`);
 });
+conn();
