@@ -18,3 +18,8 @@ router.post("/create", async (req, res) => {
 });
 
 module.exports = router;
+router.post("/", productController.create);
+router.get("/", productController.getProduct);
+router.put("/:id", productController.updatedProduct);
+
+module.exports = router;
