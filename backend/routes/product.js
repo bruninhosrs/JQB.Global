@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
-
+const productController = require("../controllers/productController");
 
 // ROTA DE CADASTRO DO PRODUTO
 router.post("/create", async (req, res) => {
@@ -17,8 +17,6 @@ router.post("/create", async (req, res) => {
     }
 });
 
-module.exports = router;
-router.post("/", productController.create);
 router.get("/", productController.getProduct);
 router.put("/:id", productController.updatedProduct);
 
