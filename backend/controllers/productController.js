@@ -66,12 +66,9 @@ const productController = {
   async updatedProduct(req, res) {
     try {
       const productId = req.params.id;
-      const { name, price, description, stock } = req.body;
+      const { stock } = req.body;
 
       const product = await ProductModel.findByIdAndUpdate(productId, {
-        name,
-        price,
-        description,
         stock,
       });
 

@@ -2,6 +2,15 @@ const API_URL = 'http://localhost:3000/product';
 
 window.onload = fetchProdutos;
 
+// Para remover a mensagem de erro de quando o valor esta fora do limite
+function removeErrorMessage(row) {
+    const existingTooltip = row.querySelector('.error-tooltip');
+    if (existingTooltip) {
+        existingTooltip.remove();
+    }
+}
+
+// Exibe a tabela
 async function fetchProdutos() {
     try {
         const response = await fetch(API_URL);
@@ -12,22 +21,23 @@ async function fetchProdutos() {
 
         produtos.forEach(produto => {
             const tr = document.createElement('tr');
-            tr.dataset.id = produto._id; // Identificador para feedback
+            tr.dataset.id = produto._id;
             
             const nome = produto.name || 'Sem nome';
+            const preco = produto.price ? parseFloat(produto.price).toFixed(2).replace('.', ',') : '0,00';
             
             tr.innerHTML = `
                 <td>${nome}</td>
                 <td>${produto.description || '-'}</td>
-                <td>R$ ${produto.price ? parseFloat(produto.price).toFixed(2).replace('.', ',') : '0,00'}</td>
-                <td>${produto.stock}</td>
+                <td>R$ ${preco}</td>
+                <td class="stock-cell">${produto.stock}</td>
                 <td>
                     <button class="btn-editar">Editar</button>
                 </td>
             `;
             
-            const btnEditar = tr.querySelector('.btn-editar');
-            btnEditar.addEventListener('click', () => iniciarEdicao(produto));
+            const btn = tr.querySelector('.btn-editar');
+            btn.addEventListener('click', () => toggleEdicao(btn, produto));
 
             tbody.appendChild(tr);
         });
@@ -40,69 +50,120 @@ async function fetchProdutos() {
     }
 }
 
-function iniciarEdicao(produto) {
-    document.getElementById('editId').value = produto._id;
-    document.getElementById('editNome').value = produto.name || '';
-    document.getElementById('editDescricao').value = produto.description || '';
-    document.getElementById('editPreco').value = produto.price;
-    document.getElementById('editEstoque').value = produto.stock;
+async function toggleEdicao(btn, produto) {
+    const row = btn.closest('tr');
+    const stockCell = row.querySelector('.stock-cell');
+    const isSaving = btn.classList.contains('btn-salvar');
 
-    document.getElementById('modalOverlay').style.display = 'flex';
-}
+    removeErrorMessage(row);
 
-function cancelarEdicao() {
-    document.getElementById('modalOverlay').style.display = 'none';
-}
+    // Modo de edição
+    if (!isSaving) {
 
-async function salvarEdicao(event) {
-    event.preventDefault(); // Impede o reload do form
+        const tbody = row.parentNode;
+        tbody.classList.add('editing-active');
 
-    const id = document.getElementById('editId').value;
-    const nome = document.getElementById('editNome').value;
-    const descricao = document.getElementById('editDescricao').value;
-    const preco = parseFloat(document.getElementById('editPreco').value);
-    const estoque = parseInt(document.getElementById('editEstoque').value);
+        // Foca a linha em edição
+        row.classList.add('row-editing');
 
-    if (!id) return;
+        const currentStock = stockCell.innerText;
+        row.dataset.originalStock = currentStock; // Store original value
+        stockCell.innerHTML = `
+            <div class="input-wrapper" style="display: flex; align-items: center;">
+                <input type="number" class="input-estoque-edit" value="${currentStock}" required min="0" max="99999">
+            </div>
+        `;
 
-    const dados = {
-        name: nome,
-        description: descricao,
-        price: preco,
-        stock: estoque
-    };
+        const input = stockCell.querySelector('.input-estoque-edit');
+        input.focus();
 
-    try {
-        const response = await fetch(`${API_URL}/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(dados)
+        //Enter salva e esc cancela e retorna ao valor anterior
+        input.addEventListener('keydown', (event) => {
+
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                btn.click();
+            }
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                removeErrorMessage(row);
+
+                stockCell.innerHTML = row.dataset.originalStock;
+                produto.stock = parseInt(row.dataset.originalStock);
+
+                btn.textContent = 'Editar';
+                btn.classList.remove('btn-salvar');
+                btn.classList.add('btn-editar');
+
+                row.classList.remove('row-editing');
+                const tbody = row.parentNode;
+                tbody.classList.remove('editing-active');
+            }
         });
 
-        //Feedback na Própria linha
-        if (response.ok) {
-            cancelarEdicao();
-            await fetchProdutos();
+        // Altera o botao de editar para salvar
+        btn.textContent = 'Salvar';
+        btn.classList.remove('btn-editar');
+        btn.classList.add('btn-salvar');
 
-            const row = document.querySelector(`tr[data-id="${id}"]`);
-            if (row) {
-                row.classList.add('row-success');
-                setTimeout(() => row.classList.remove('row-success'), 4000);
-            }
+    } else {
+        const input = stockCell.querySelector('.input-estoque-edit');
+        const inputWrapper = stockCell.querySelector('.input-wrapper');
+        const newStock = parseInt(input.value);
+
+        // Feedback do botao em caso de erro
+        if (isNaN(newStock) || newStock < 0 || newStock > 99999) {
+            btn.classList.add('btn-error');
+            setTimeout(() => btn.classList.remove('btn-error'), 400);
+            input.focus();
+            
+            const errorMessage = document.createElement('span');
+            errorMessage.classList.add('error-tooltip');
+            errorMessage.style.color = 'red';
+            errorMessage.style.fontSize = '0.8em';
+            errorMessage.style.marginLeft = '10px';
+            errorMessage.style.whiteSpace = 'nowrap';
+            errorMessage.textContent = 'O estoque deve ser entre 0 e 99999.';
+            
+            inputWrapper.appendChild(errorMessage);
+            return;
         }
-    } catch (error) {
-        console.error('Erro ao salvar:', error);
-        cancelarEdicao();
-        const row = document.querySelector(`tr[data-id="${id}"]`);
-        if (row) {
-            row.classList.add('row-error');
-            setTimeout(() => row.classList.remove('row-error'), 4000);
+
+        try {
+            const response = await fetch(`${API_URL}/${produto._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ stock: newStock })
+            });
+
+            if (response.ok) {
+                removeErrorMessage(row);
+                stockCell.innerHTML = newStock;
+                produto.stock = newStock;
+                delete row.dataset.originalStock;
+
+                // Reseta o botao ao estado padrao
+                btn.textContent = 'Editar';
+                btn.classList.remove('btn-salvar');
+                btn.classList.add('btn-editar');
+
+                // Desativa o modo de edição e dispara o feedback
+                row.classList.remove('row-editing');
+                row.classList.add('row-success');
+                const tbody = row.parentNode;
+                tbody.classList.remove('editing-active');
+
+                setTimeout(() => row.classList.remove('row-success'), 1500);
+            }
+
+        } catch (error) {
+            console.error('Erro ao salvar:', error);
+            alert('Erro ao atualizar o estoque no servidor.');
         }
     }
 }
 
-document.getElementById('formEditarProduto').addEventListener('submit', salvarEdicao);
-window.cancelarEdicao = cancelarEdicao;
 
