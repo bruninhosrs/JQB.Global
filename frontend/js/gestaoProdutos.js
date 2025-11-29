@@ -124,7 +124,7 @@ async function toggleEdicao(btn, produto) {
             errorMessage.style.fontSize = '0.8em';
             errorMessage.style.marginLeft = '10px';
             errorMessage.style.whiteSpace = 'nowrap';
-            errorMessage.textContent = 'O estoque deve ser entre 0 e 99999.';
+            errorMessage.innerHTML = 'O valor deve ser entre <br> 0 e 99999.';
             
             inputWrapper.appendChild(errorMessage);
             return;
