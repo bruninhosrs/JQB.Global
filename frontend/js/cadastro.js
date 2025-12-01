@@ -1,10 +1,12 @@
+
+
+// Para desabilitar o botão de acordo com os campos obrigatórios
 function validateForm() {
     const name = document.querySelector("#name").value.trim();
     const price = document.querySelector("#price").value;
     const stock = document.querySelector("#stock").value;
     const btnSubmit = document.querySelector("#btnSubmit");
 
-    // Habilita o botão após os campos serem preencjidos
     if (name && price && stock) {
         btnSubmit.disabled = false;
         btnSubmit.style.opacity = "1";
@@ -28,7 +30,7 @@ document.querySelector("#productForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const product = {
-        name_product: document.querySelector("#name").value,
+        name: document.querySelector("#name").value,
         price: Number(document.querySelector("#price").value),
         stock: Number(document.querySelector("#stock").value),
         description: document.querySelector("#description").value

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Center - Cadastro de Produtos</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand"><span class="brand-main">JBQ.Global</span></div>
+    <div class="nav-title">Seller Center</div>
+    <div class="nav-tag">MVP - SQUAD 5</div>
+</nav>
+
+<div class="container-form">
+
+    <a href="../index.html" class="back-link">
+        <span class="material-icons-round" style="font-size: 20px; margin-right: 8px;">arrow_back</span>
+        Voltar ao Menu
+    </a>
+
+    <header class="page-header">
+        <h1>Gestão de Estoque</h1>
+        <p>Clique em editar para alterar as informações de um produto já cadastrado.</p>
+    </header>
+
+    <main class="form-card" style="max-width: 1200px; padding: 0; background: transparent; box-shadow: none; border: none;">
+        <div id="loading">Carregando produtos...</div>
+        
+        <div class="table-responsive">
+            <table id="tabelaProdutos" style="display:none; width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="listaProdutos">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pagination-controls" style="display: flex; justify-content: center; align-items: center; margin-top: 15px; gap: 15px;"></div>
+
+
+    </main>
+
+    <footer class="footer-gestao">
+        <p>Aceleradora Dual de Talentos - Ânima Educação & JBQ.Global</p>
+        <p>Tela desenvolvida pelos membros do Squad 5</p>
+        <p>2025.2</p>
+    </footer>
+</div>
+
+    <script src="../js/gestaoProdutos.js"></script>
+</body>
+</html>
