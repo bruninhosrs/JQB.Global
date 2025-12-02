@@ -4,6 +4,8 @@ Este projeto é uma aplicação de **Seller Center** desenvolvida no contexto da
 
 O desenvolvimento foi realizado de maneira integrada e colaborativa entre duas squads que compartilham o mesmo time de desenvolvimento, cujas funcionalidades são acessíveis através de uma **Homepage** central desenvolvida pelo time de front-end:
 
+Todas as telas possuem responsividade Mobile funcional.
+
 *   **Squad 1:** Responsável pelo módulo de **Cadastro de Produtos**.
 *   **Squad 5:** Responsável pelo módulo de **Gestão de Estoque**.
 
@@ -60,6 +62,7 @@ O desenvolvimento foi realizado de maneira integrada e colaborativa entre duas s
 
 *   **Desenvolvimento Back-end:**
     *   Bruno Rodrigues
+    *   Jordan Estevan
     *   Felipe Coelho
 
 ![Funcionalidade Squad 5](anexos/FuncionalidadeSquad5.png)
